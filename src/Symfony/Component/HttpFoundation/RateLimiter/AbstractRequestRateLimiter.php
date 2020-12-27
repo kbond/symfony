@@ -19,6 +19,7 @@ use Symfony\Component\RateLimiter\NoLimiter;
 /**
  * An implementation of RequestRateLimiterInterface that
  * fits most use-cases.
+ * See https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  *
