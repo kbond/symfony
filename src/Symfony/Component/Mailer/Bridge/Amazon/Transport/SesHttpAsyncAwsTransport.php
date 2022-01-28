@@ -87,7 +87,20 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
             && $sourceArnHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-SOURCE-ARN')) {
             $request['FromEmailAddressIdentityArn'] = $sourceArnHeader->getBodyAsString();
         }
+        if (($message->getOriginalMessage() instanceof Message)
+            && $configurationSetHeader =  $message->getOriginalMessage()->getHeaders()->get('X-SES-MESSAGE-TAGS')) {
+            $request['EmailTags'] = $this->arrayifyMessageTags($configurationSetHeader->getBodyAsString());
+        }
 
         return new SendEmailRequest($request);
+    }
+
+    protected function arrayifyMessageTags(string $tags): array
+    {
+        return array_map(function (string $tag) {
+            $tag = explode('=', trim($tag), 2);
+
+            return ['Name' => $tag[0], 'Value' => $tag[1]];
+        }, explode(',', $tags));
     }
 }

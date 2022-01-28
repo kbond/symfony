@@ -86,6 +86,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
             $this->assertStringContainsString('Hello There!', $content);
             $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
             $this->assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
+            $this->assertSame([['Name' => 'tagName1', 'Value' => 'tagValue1'], ['Name' => 'tagName2', 'Value' => 'tagValue2']], $body['EmailTags']);
 
             $json = '{"MessageId": "foobar"}';
 
@@ -104,6 +105,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
 
         $mail->getHeaders()->addTextHeader('X-SES-CONFIGURATION-SET', 'aws-configuration-set-name');
         $mail->getHeaders()->addTextHeader('X-SES-SOURCE-ARN', 'aws-source-arn');
+        $mail->getHeaders()->addTextHeader('X-SES-MESSAGE-TAGS', 'tagName1=tagValue1, tagName2=tagValue2');
 
         $message = $transport->send($mail);
 

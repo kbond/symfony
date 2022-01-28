@@ -95,6 +95,9 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         if ($header = $email->getHeaders()->get('X-SES-SOURCE-ARN')) {
             $request['FromEmailAddressIdentityArn'] = $header->getBodyAsString();
         }
+        if ($header = $email->getHeaders()->get('X-SES-MESSAGE-TAGS')) {
+            $request['EmailTags'] = $this->arrayifyMessageTags($header->getBodyAsString());
+        }
         if ($email->getReturnPath()) {
             $request['FeedbackForwardingEmailAddress'] = $email->getReturnPath()->toString();
         }
