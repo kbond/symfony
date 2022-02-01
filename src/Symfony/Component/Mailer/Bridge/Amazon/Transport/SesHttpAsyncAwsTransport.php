@@ -18,6 +18,7 @@ use AsyncAws\Ses\ValueObject\Destination;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Message;
@@ -87,20 +88,14 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
             && $sourceArnHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-SOURCE-ARN')) {
             $request['FromEmailAddressIdentityArn'] = $sourceArnHeader->getBodyAsString();
         }
-        if (($message->getOriginalMessage() instanceof Message)
-            && $configurationSetHeader = $message->getOriginalMessage()->getHeaders()->get('X-SES-MESSAGE-TAGS')) {
-            $request['EmailTags'] = $this->arrayifyMessageTags($configurationSetHeader->getBodyAsString());
+        if ($message->getOriginalMessage() instanceof Message) {
+            foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
+                if ($header instanceof MetadataHeader) {
+                    $request['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
+                }
+            }
         }
 
         return new SendEmailRequest($request);
-    }
-
-    protected function arrayifyMessageTags(string $tags): array
-    {
-        return array_map(function (string $tag) {
-            $tag = explode('=', trim($tag), 2);
-
-            return ['Name' => $tag[0], 'Value' => $tag[1]];
-        }, explode(',', $tags));
     }
 }
