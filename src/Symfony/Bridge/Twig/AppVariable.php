@@ -100,7 +100,7 @@ class AppVariable
         }
         $request = $this->getRequest();
 
-        return $request?->hasSession() ? $request->getSession() : null;
+        return $request?->hasSession(true) ? $request->getSession() : null;
     }
 
     /**

@@ -55,12 +55,22 @@ class AppVariableTest extends TestCase
     public function testGetSession()
     {
         $request = $this->createMock(Request::class);
-        $request->method('hasSession')->willReturn(true);
+        $request->method('hasSession')->with(true)->willReturn(true);
         $request->method('getSession')->willReturn($session = new Session());
 
         $this->setRequestStack($request);
 
         $this->assertEquals($session, $this->appVariable->getSession());
+    }
+
+    public function testGetSessionUninitialized()
+    {
+        $request = new Request();
+        $request->setSessionFactory(fn() => null);
+
+        $this->setRequestStack($request);
+
+        $this->assertNull($this->appVariable->getSession());
     }
 
     public function testGetSessionWithNoRequest()
@@ -150,6 +160,16 @@ class AppVariableTest extends TestCase
     public function testGetFlashesWithNoRequest()
     {
         $this->setRequestStack(null);
+
+        $this->assertEquals([], $this->appVariable->getFlashes());
+    }
+
+    public function testGetFlashesWithUninitializedSession()
+    {
+        $request = new Request();
+        $request->setSessionFactory(fn() => null);
+
+        $this->setRequestStack($request);
 
         $this->assertEquals([], $this->appVariable->getFlashes());
     }
@@ -253,7 +273,7 @@ class AppVariableTest extends TestCase
         $session->method('getFlashBag')->willReturn($flashBag);
 
         $request = $this->createMock(Request::class);
-        $request->method('hasSession')->willReturn(true);
+        $request->method('hasSession')->with(true)->willReturn(true);
         $request->method('getSession')->willReturn($session);
         $this->setRequestStack($request);
 
