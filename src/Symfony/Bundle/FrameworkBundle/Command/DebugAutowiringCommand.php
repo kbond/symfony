@@ -30,7 +30,7 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
  *
  * @internal
  */
-#[AsCommand(name: 'debug:autowiring', description: 'List classes/interfaces you can use for autowiring')]
+#[AsCommand(name: 'debug:autowiring', description: 'List classes/interfaces you can use for autowiring', aliases: ['debug:autowire'])]
 class DebugAutowiringCommand extends ContainerDebugCommand
 {
     private bool $supportsHref;
